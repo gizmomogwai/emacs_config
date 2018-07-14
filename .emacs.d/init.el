@@ -107,6 +107,11 @@
 
 (use-package git-timemachine
   :ensure t)
+
+(use-package diff-hl
+  :ensure t
+  :config (global-diff-hl-mode))
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 (if (< (length command-line-args) 2 )

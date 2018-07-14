@@ -22,7 +22,7 @@
  '(ns-command-modifier (quote meta))
  '(package-selected-packages
    (quote
-    (git-timemachine json-mode plantuml-mode magit-org-todos key-chord dashboard expand-region helm-ag projectile exec-path-from-shell eglot undo-tree color-theme-zenburn lsp-ui-flycheck lsp-flycheck flycheck company editorconfig zenburn-theme helm magit use-package)))
+    (diff-hl git-timemachine json-mode plantuml-mode magit-org-todos key-chord dashboard expand-region helm-ag projectile exec-path-from-shell eglot undo-tree color-theme-zenburn lsp-ui-flycheck lsp-flycheck flycheck company editorconfig zenburn-theme helm magit use-package)))
  '(plantuml-jar-path "/Users/gizmo/bin/plantuml.1.2018.7.jar")
  '(rg-custom-type-aliases nil)
  '(rg-group-result t)
