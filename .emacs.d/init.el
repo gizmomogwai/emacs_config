@@ -31,9 +31,12 @@
 	  (key-chord-define-global "xx" 'helm-M-x)
 	  (key-chord-define-global "BB" 'beginning-of-buffer)
 	  (key-chord-define-global "BE" 'end-of-buffer)
+	  (key-chord-define-global "bb" 'helm-mini)
 	  (key-chord-define-global "br" 'kill-buffer)
+	  (key-chord-define-global "bw" 'save-buffer)
 	  (key-chord-define-global "gs" 'magit-status)
 	  (key-chord-define-global "GG" 'goto-line)
+	  (key-chord-define-global "yy" 'helm-show-kill-ring)
 	  (key-chord-mode 1)))
 
 (use-package helm
@@ -93,10 +96,19 @@
 
 (use-package magit-org-todos
   :ensure t
-  :config
-  (magit-org-todos-autoinsert))
+  :config (magit-org-todos-autoinsert))
 
-(setq custom-file "~/.custom.el")
+(use-package plantuml-mode
+  :ensure t
+  :config (plantuml-set-output-type "utxt"))
+
+(use-package json-mode
+  :ensure t)
+
+(use-package git-timemachine
+  :ensure t)
+(setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 (if (< (length command-line-args) 2 )
-       (helm-recentf))
+    (helm-recentf))
+
