@@ -131,6 +131,10 @@
   :straight t
   :config (global-auto-revert-mode))
 
+(use-package anzu
+  :straight t
+  :config (global-anzu-mode +1))
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
