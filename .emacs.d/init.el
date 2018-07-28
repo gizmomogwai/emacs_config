@@ -139,6 +139,9 @@
   :straight t
   :config (move-text-default-bindings))
 
+(use-package goto-chg
+  :straight t)
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
