@@ -135,6 +135,10 @@
   :straight t
   :config (global-anzu-mode +1))
 
+(use-package move-text
+  :straight t
+  :config (move-text-default-bindings))
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
