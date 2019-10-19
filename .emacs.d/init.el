@@ -77,10 +77,26 @@
   :straight t
   :config (minions-mode 1))
 
+
+(c-add-style "my-d-mode"
+  '("cc-mode"
+     (c-basic-offset . 4)
+     (c-offsets-alist
+       (arglist-intro . +)
+       (arglist-close . 0)
+       (substatement-open . 0)
+       (statement-cont . +)
+       (inline-open . 0)
+       (label . +)
+       )))
+
 (defun my-d-mode-setup ()
   "Setup indent according to dfmt's defaults."
-  (add-to-list 'c-offsets-alist
-    '(substatement-open . 0)))
+  (interactive)
+  (message "setting up d-mode indents")
+  (c-set-style "my-d-mode")
+  (setq show-trailing-whitespace t)
+  )
 
 (use-package d-mode
   :straight t
@@ -107,7 +123,35 @@
   (key-chord-define-global "gs" 'magit-status)
   (key-chord-define-global "GG" 'goto-line)
   (key-chord-define-global "yy" 'helm-show-kill-ring)
+  (key-chord-define-global "PP" 'hydra-projectile/body)
   (key-chord-mode 1))
+
+(use-package hydra
+  :straight t
+  :config
+  (defhydra hydra-projectile (:columns 4)
+    "
+Project %(projectile-project-root) "
+    ("b" projectile-compile-project "Build")
+    ("c" projectile-invalidate-cache "Clear Cache")
+    ("f" projectile-find-file "Find File")
+    ("g" deadgrep "Ripgrep")
+    ("i" projectile-project-info "Info")
+    ("k" projectile-kill-buffers "Kill Buffers")
+    ("l" projectile-layout-project "Layout")
+    ("o" projectile-multi-occur "Multi Occur")
+    ("q" nil "Cancel" color: blue)
+    ("r" projectile-run-project "Run")
+    ("s" magit-status "Magit")
+    ("t" projectile-test-project "Test")    
+    ))
+
+(defun projectile-layout-project ()
+  "Format a project."
+  (interactive)
+  (message "%s" (projectile-project-type))
+  (pcase (projectile-project-type)
+    ('dmd (shell-command "find . -name \"*.d\" | xargs dfmt -i"))))
 
 (use-package helm
   :straight t
@@ -121,13 +165,20 @@
 
 (use-package projectile
   :straight t
-  :config (projectile-mode 1))
+  :config (projectile-mode 1)
+  (projectile-register-project-type 'dmd '("dub.sdl")
+    :compile "source ~/dlang/dmd-2.085.1/activate.fish && dub build"
+    :test "source ~/dlang/dmd-2.085.1/activate.fish && dub test"
+    :run "source ~/dlang/dmd-2.085.1/activate.fish && dub run")
+  )
+
 (use-package projectile-rails
   :straight t
   :config (projectile-rails-global-mode 1))
 
 (use-package helm-projectile
   :straight t)
+
 
 (use-package company
   :straight t
@@ -211,9 +262,9 @@
 (use-package ecukes
   :straight t)
 
-(use-package aggressive-indent
-  :straight t
-  :config (global-aggressive-indent-mode 1))
+;;(use-package aggressive-indent
+;;  :straight t
+;;  :config (global-aggressive-indent-mode 1))
 
 (use-package autorevert
   :straight t
