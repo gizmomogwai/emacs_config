@@ -191,9 +191,9 @@ Project %(projectile-project-root) "
   :config (global-flycheck-mode 1)
   :after (exec-path-from-shell))
 
-(use-package helm-ag
-  :straight t
-  :config (global-set-key (kbd "M-s") 'helm-ag-project-root))
+;;(use-package helm-ag
+;;  :straight t
+;;  :config (global-set-key (kbd "M-s") 'helm-ag-project-root))
 
 (use-package expand-region
   :straight t
@@ -250,6 +250,9 @@ Project %(projectile-project-root) "
 (use-package plantuml-mode
   :straight t
   :config (plantuml-set-output-type "png"))
+
+(use-package graphviz-dot-mode
+  :straight t)
 
 (use-package htmlize
   :straight t)
@@ -308,6 +311,14 @@ Project %(projectile-project-root) "
   :config (which-key-mode 1))
 
 (use-package deadgrep
+  :straight t)
+
+(use-package wgrep
+  :straight t)
+(use-package elgrep
+  :straight t)
+
+(use-package noccur
   :straight t)
 
 (use-package counsel

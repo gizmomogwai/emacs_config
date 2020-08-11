@@ -139,7 +139,8 @@
          ("\\.pdf\\'" . default)
          (directory . emacs))))
  '(org-log-done (quote note))
- '(org-plantuml-jar-path "~/bin/plantuml.jar")
+ '(org-plantuml-jar-path "~/bin/plantuml.1.2018.13.jar")
+ '(org-pomodoro-length 20)
  '(org-roam-autopopulate-title nil)
  '(org-roam-directory "~/Dropbox/org/roam/")
  '(org-roam-graph-viewer /usr/bin/open)
@@ -164,7 +165,12 @@
  '(rg-show-columns t)
   '(safe-local-variable-values
      (quote
-       ((org-link-file-path-type . relative)
+       ((eval flycheck-cask-setup)
+         (eval progn
+           (goto-char
+             (point-min))
+           (org-columns t))
+         (org-link-file-path-type . relative)
          (projectile-project-compilation-cmd . "source ~/dlang/dmd-2.085.0/activate.fish && cat ~/Downloads/received.log | dub run")
          (projectile-project-compilation-cmd . "source ~/dlang/dmd-2.085.0/activate.fish && dub test -- -s -t -d")
          (eval org-columns)
