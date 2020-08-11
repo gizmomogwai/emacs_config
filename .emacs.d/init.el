@@ -31,20 +31,7 @@
 (straight-use-package 'use-package)
 
 (use-package magit
-  :straight t
-  :config
-  (magit-define-popup-action 'magit-push-popup
-    ?g
-    "Push to gerrit"
-    'magit-push-to-gerrit)
-  (defun magit-push-to-gerrit (remote target)
-    "Push to remote REMOTE to refs/for/TARGET."
-    (interactive
-      (let* (
-              (remote (magit-read-remote "Remote" "origin"))
-              (target (magit-read-remote-branch "Target branch" remote "master" nil)))
-        (list remote target)))
-    (magit-run-git-async "push" remote (format "HEAD:refs/for/%s" target))))
+  :straight t)
 
 (use-package git-timemachine
   :straight t)
@@ -59,6 +46,10 @@
 
 (use-package ranger
   :straight t)
+
+(use-package tff
+  :straight (tff :type git :host github :repo "gizmomogwai/tff")
+  :config (global-set-key (kbd "C-1") 'tff))
 
 ;;(use-package org-kanban
 ;;:straight t)
@@ -76,7 +67,6 @@
 (use-package minions
   :straight t
   :config (minions-mode 1))
-
 
 (c-add-style "my-d-mode"
   '("cc-mode"
@@ -105,10 +95,10 @@
 (use-package helpful
   :straight t)
 
-(use-package docker
-  :straight t)
-(use-package dockerfile-mode
-  :straight t)
+;;(use-package docker
+;;  :straight t)
+;;(use-package dockerfile-mode
+;;  :straight t)
 (use-package key-chord
   :straight t
   :config
@@ -124,6 +114,7 @@
   (key-chord-define-global "GG" 'goto-line)
   (key-chord-define-global "yy" 'helm-show-kill-ring)
   (key-chord-define-global "PP" 'hydra-projectile/body)
+  (key-chord-define-global "TT" 'tff)
   (key-chord-mode 1))
 
 (use-package hydra
@@ -166,19 +157,23 @@ Project %(projectile-project-root) "
 (use-package projectile
   :straight t
   :config (projectile-mode 1)
-  (projectile-register-project-type 'dmd '("dub.sdl")
-    :compile "source ~/dlang/dmd-2.085.1/activate.fish && dub build"
-    :test "source ~/dlang/dmd-2.085.1/activate.fish && dub test"
-    :run "source ~/dlang/dmd-2.085.1/activate.fish && dub run")
-  )
+  (projectile-register-project-type
+    'dmd
+    '("dub.sdl")
+    :compile "source ~/dlang/dmd-2.091.0/activate.fish && dub build"
+    :test "source ~/dlang/dmd-2.091.0/activate.fish && dub test"
+    :run "source ~/dlang/dmd-2.091.0/activate.fish && dub build && dub run dscanner -- --styleCheck . || true && dub run -- . .. ../.."
+  ))
 
-(use-package projectile-rails
-  :straight t
-  :config (projectile-rails-global-mode 1))
+;;(use-package projectile-rails
+;;  :straight t
+;;  :config (projectile-rails-global-mode 1))
 
 (use-package helm-projectile
   :straight t)
 
+(use-package protobuf-mode
+  :straight t)
 
 (use-package company
   :straight t
@@ -203,6 +198,24 @@ Project %(projectile-project-root) "
 (use-package expand-region
   :straight t
   :config (global-set-key (kbd "C-M-w") 'er/expand-region))
+
+
+(use-package org-roam
+      :after org
+      :hook 
+      ((org-mode . org-roam-mode)
+       (after-init . org-roam--build-cache-async) ;; optional!
+       )
+      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+      :custom
+  (org-roam-directory "~/Dropbox/org/roam/")
+  (org-roam-graph-viewer "/usr/bin/open")
+      :bind
+      ("C-c n l" . org-roam)
+      ("C-c n t" . org-roam-today)
+      ("C-c n f" . org-roam-find-file)
+      ("C-c n i" . org-roam-insert)
+      ("C-c n g" . org-roam-show-graph))
 
 ;;(use-package markdown-mode
 ;;  :straight t)
@@ -236,7 +249,8 @@ Project %(projectile-project-root) "
 
 (use-package plantuml-mode
   :straight t
-  :config (plantuml-set-output-type "utxt"))
+  :config (plantuml-set-output-type "png"))
+
 (use-package htmlize
   :straight t)
 (use-package groovy-mode
@@ -244,7 +258,8 @@ Project %(projectile-project-root) "
   :config (add-to-list 'auto-mode-alist '("\.gradle$" . groovy-mode)))
 (use-package lua-mode
   :straight t)
-;;(use-package json-mode
+
+  ;;(use-package json-mode
 ;;:straight t)
 
 ;;(use-package highlight-symbol
@@ -298,8 +313,10 @@ Project %(projectile-project-root) "
 (use-package counsel
   :straight t)
 
-(use-package swiper-helm
-  :straight t)
+;; uses magit-popup
+;;(use-package swiper-helm
+  ;; :straight t)
+  
 (use-package command-log-mode
   :straight t)
 
@@ -314,6 +331,10 @@ Project %(projectile-project-root) "
 (require 'hideshow)
 (require 'sgml-mode)
 (require 'nxml-mode)
+
+(use-package docker
+  :straight t
+  :bind ("C-c d" . docker))
 
 (add-to-list 'hs-special-modes-alist
   '(nxml-mode
@@ -454,4 +475,18 @@ point reaches the beginning or end of the buffer, stop there."
   (lambda() (when (eq major-mode 'compilation-mode)
               (ansi-color-apply-on-region compilation-filter-start (point-max)))))
 
+(defun org-link-mark-file-and-line ()
+  "Copy current file and line to org-link."
+  (interactive)
+  (setq org-link--file (buffer-file-name))
+  (setq org-link--line (line-number-at-pos)))
+
+(defun org-link-paste (link-text)
+  "Paste a link to the last mark as LINK-TEXT."
+  (interactive (list (read-string
+                       (format "Linktext (%s): " (format "%s:%s" org-link--file org-link--line))
+                       nil
+                       nil
+                       (format "%s:%s" org-link--file org-link--line))))
+  (insert (format "[[%s::%s][%s]]" (file-relative-name org-link--file (file-name-directory (buffer-file-name))) org-link--line link-text)))
 ;;; init.el ends here

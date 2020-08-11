@@ -33,6 +33,8 @@
      (quote
        (company-pseudo-tooltip-unless-just-one-frontend company-preview-frontend company-echo-metadata-frontend)))
  '(company-minimum-prefix-length 2)
+ '(compilation-always-kill t)
+ '(compilation-auto-jump-to-first-error t)
  '(compilation-scroll-output (quote first-error))
  '(confirm-nonexistent-file-or-buffer nil)
  '(custom-enabled-themes (quote (zenburn)))
@@ -129,23 +131,41 @@
  '(org-agenda-files (quote ("~/Dropbox/org/")))
  '(org-closed-keep-when-no-todo t)
  '(org-confirm-babel-evaluate nil)
+  '(org-file-apps
+     (quote
+       ((auto-mode . emacs)
+         ("\\.mm\\'" . default)
+         ("\\.x?html?\\'" . default)
+         ("\\.pdf\\'" . default)
+         (directory . emacs))))
  '(org-log-done (quote note))
- '(org-plantuml-jar-path "~/bin/plantuml.1.2018.13.jar")
+ '(org-plantuml-jar-path "~/bin/plantuml.jar")
+ '(org-roam-autopopulate-title nil)
+ '(org-roam-directory "~/Dropbox/org/roam/")
+ '(org-roam-graph-viewer /usr/bin/open)
+ '(org-roam-link-title-format "%s")
   '(package-selected-packages
      (quote
        (clipmon char-menu typit typeit zzz-to-char ztree aggressive-indent org-htmlslidy minions whole-line-or-region hydra sublimity ecukes diff-hl git-timemachine json-mode plantuml-mode magit-org-todos key-chord expand-region helm-ag projectile exec-path-from-shell eglot undo-tree color-theme-zenburn lsp-ui-flycheck lsp-flycheck flycheck company editorconfig zenburn-theme helm magit use-package)))
+ '(plantuml-default-exec-mode (quote jar))
  '(plantuml-jar-path "~/bin/plantuml.jar")
+ '(projectile-cache-file "/Users/gizmo/tmp/projectile.cache")
  '(projectile-completion-system (quote helm))
  '(projectile-enable-caching t)
- '(projectile-indexing-method (quote hybrid))
+ '(projectile-indexing-method (quote alien))
+  '(projectile-project-root-files
+     (quote
+       ("rebar.config" "project.clj" "build.boot" "deps.edn" "SConstruct" "pom.xml" "build.sbt" "gradlew" "build.gradle" ".ensime" "Gemfile" "requirements.txt" "setup.py" "pyproject.toml" "tox.ini" "composer.json" "Cargo.toml" "mix.exs" "stack.yaml" "info.rkt" "DESCRIPTION" "TAGS" "GTAGS" "configure.in" "configure.ac" "cscope.out" ".projectile" ".git")))
  '(projectile-require-project-root t)
+ '(read-file-name-completion-ignore-case t)
  '(recenter-positions (quote (top middle bottom)))
  '(rg-custom-type-aliases nil)
  '(rg-group-result t)
  '(rg-show-columns t)
   '(safe-local-variable-values
      (quote
-       ((projectile-project-compilation-cmd . "source ~/dlang/dmd-2.085.0/activate.fish && cat ~/Downloads/received.log | dub run")
+       ((org-link-file-path-type . relative)
+         (projectile-project-compilation-cmd . "source ~/dlang/dmd-2.085.0/activate.fish && cat ~/Downloads/received.log | dub run")
          (projectile-project-compilation-cmd . "source ~/dlang/dmd-2.085.0/activate.fish && dub test -- -s -t -d")
          (eval org-columns)
          (eval goto-char
@@ -167,17 +187,18 @@
  '(scroll-bar-mode nil)
  '(scroll-conservatively 10000)
  '(scroll-preserve-screen-position t)
+ '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
  '(version-control t)
  '(view-read-only t)
  '(whitespace-style (quote (trailing tabs spaces indentation::space tab-mark)))
  '(x-stretch-cursor t))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
-  '(calendar-iso-week-face ((t (:foreground "gray40"))) t)
-  '(calendar-today ((t (:inverse-video t))))
-  '(whitespace-hspace ((t nil)))
-  '(whitespace-space ((t nil))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(calendar-iso-week-face ((t (:foreground "gray40"))) t)
+ '(calendar-today ((t (:inverse-video t))))
+ '(whitespace-hspace ((t nil)))
+ '(whitespace-space ((t nil))))
