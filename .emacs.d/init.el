@@ -30,6 +30,15 @@
 
 (straight-use-package 'use-package)
 
+(use-package project
+  :straight t)
+
+;;(use-package org-mode
+;;  :straight t)
+;;  :config (progn
+;;            (defalias 'D-mode 'd-mode)
+;;            (require 'ob-C)))
+
 (use-package magit
   :straight t)
 
@@ -44,9 +53,6 @@
   :straight t
   :config (whole-line-or-region-global-mode))
 
-(use-package ranger
-  :straight t)
-
 (use-package tff
   :straight (tff :type git :host github :repo "gizmomogwai/tff")
   :config (global-set-key (kbd "C-1") 'tff))
@@ -54,11 +60,9 @@
 ;;(use-package org-kanban
 ;;:straight t)
 
-(use-package org-pomodoro
-  :straight t)
-(use-package magit-org-todos
-  :straight t
-  :config (magit-org-todos-autoinsert))
+                                        ;(use-package magit-org-todos
+;  :straight t
+;  :config (magit-org-todos-autoinsert))
 
 (use-package editorconfig
   :straight t
@@ -67,30 +71,6 @@
 (use-package minions
   :straight t
   :config (minions-mode 1))
-
-(c-add-style "my-d-mode"
-  '("cc-mode"
-     (c-basic-offset . 4)
-     (c-offsets-alist
-       (arglist-intro . +)
-       (arglist-close . 0)
-       (substatement-open . 0)
-       (statement-cont . +)
-       (inline-open . 0)
-       (label . +)
-       )))
-
-(defun my-d-mode-setup ()
-  "Setup indent according to dfmt's defaults."
-  (interactive)
-  (message "setting up d-mode indents")
-  (c-set-style "my-d-mode")
-  (setq show-trailing-whitespace t)
-  )
-
-(use-package d-mode
-  :straight t
-  :config (add-hook 'd-mode-hook 'my-d-mode-setup))
 
 (use-package helpful
   :straight t)
@@ -108,9 +88,9 @@
   (key-chord-define-global "BB" 'beginning-of-buffer)
   (key-chord-define-global "BE" 'end-of-buffer)
   (key-chord-define-global "bb" 'helm-mini)
-  (key-chord-define-global "br" 'kill-buffer)
+  (key-chord-define-global "BR" 'kill-buffer)
   (key-chord-define-global "bw" 'save-buffer)
-  (key-chord-define-global "gs" 'magit-status)
+  (key-chord-define-global "GS" 'magit-status)
   (key-chord-define-global "GG" 'goto-line)
   (key-chord-define-global "yy" 'helm-show-kill-ring)
   (key-chord-define-global "PP" 'hydra-projectile/body)
@@ -134,7 +114,7 @@ Project %(projectile-project-root) "
     ("q" nil "Cancel" color: blue)
     ("r" projectile-run-project "Run")
     ("s" magit-status "Magit")
-    ("t" projectile-test-project "Test")    
+    ("t" projectile-test-project "Test")
     ))
 
 (defun projectile-layout-project ()
@@ -142,11 +122,14 @@ Project %(projectile-project-root) "
   (interactive)
   (message "%s" (projectile-project-type))
   (pcase (projectile-project-type)
-    ('dmd (shell-command "find . -name \"*.d\" | xargs dfmt -i"))))
+    ('dmd (shell-command "find . -name \"*.d\" | xargs dub run dfmt -- -i"))))
 
 (use-package helm
   :straight t
-  :config (helm-mode +1))
+  :config
+    (helm-mode +1)
+    (global-set-key (kbd "C-x C-f") #'helm-find-files)
+    (global-set-key (kbd "M-x") #'helm-M-x))
 
 (use-package char-menu
   :straight t)
@@ -200,22 +183,22 @@ Project %(projectile-project-root) "
   :config (global-set-key (kbd "C-M-w") 'er/expand-region))
 
 
-(use-package org-roam
-      :after org
-      :hook 
-      ((org-mode . org-roam-mode)
-       (after-init . org-roam--build-cache-async) ;; optional!
-       )
-      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
-      :custom
-  (org-roam-directory "~/Dropbox/org/roam/")
-  (org-roam-graph-viewer "/usr/bin/open")
-      :bind
-      ("C-c n l" . org-roam)
-      ("C-c n t" . org-roam-today)
-      ("C-c n f" . org-roam-find-file)
-      ("C-c n i" . org-roam-insert)
-      ("C-c n g" . org-roam-show-graph))
+;;(use-package org-roam
+;;      :after org
+;;      :hook
+;;      ((org-mode . org-roam-mode)
+;;       (after-init . org-roam--build-cache-async) ;; optional!
+;;       )
+;;      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+;;      :custom
+;;  (org-roam-directory "~/Dropbox/org/roam/")
+;;  (org-roam-graph-viewer "/usr/bin/open")
+;;      :bind
+;;      ("C-c n l" . org-roam)
+;;      ("C-c n t" . org-roam-today)
+;;      ("C-c n f" . org-roam-find-file)
+;;      ("C-c n i" . org-roam-insert)
+;;      ("C-c n g" . org-roam-show-graph))
 
 ;;(use-package markdown-mode
 ;;  :straight t)
@@ -238,11 +221,28 @@ Project %(projectile-project-root) "
   :config (yas-global-mode 1))
 (use-package yasnippet-snippets
   :straight t)
-(use-package emmet-mode
-  :straight t
-  :config
-  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-  (add-hook 'css-mode-hook 'emmet-mode))
+(use-package yafolding
+  :straight (yafolding :type git :host github :repo "vindarel/yafolding.el")
+  :config (progn
+            (defhydra yafolding-hydra (:color blue :columns 3)
+              "Fold code based on indentation levels."
+              ("t" yafolding-toggle-element "toggle element")
+              ("s" yafolding-show-element "show element")
+              ("h" yafolding-hide-element "hide element")
+              ("T" yafolding-toggle-all "toggle all")
+              ("S" yafolding-show-all "show all")
+              ("H" yafolding-hide-all "hide all")
+              ("p" yafolding-hide-parent-element "hide parent element")
+              ("i" yafolding-get-indent-level "get indent level")
+              ("g" yafolding-go-parent-element "go parent element"))
+            (global-set-key (kbd "C-c f") 'yafolding-hydra/body)))
+
+
+;;(use-package emmet-mode
+;;  :straight t
+;;  :config
+;;  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+;;  (add-hook 'css-mode-hook 'emmet-mode))
 
 (use-package org-pomodoro
   :straight t)
@@ -256,11 +256,12 @@ Project %(projectile-project-root) "
 
 (use-package htmlize
   :straight t)
+
 (use-package groovy-mode
   :straight t
   :config (add-to-list 'auto-mode-alist '("\.gradle$" . groovy-mode)))
-(use-package lua-mode
-  :straight t)
+;;(use-package lua-mode
+;;  :straight t)
 
   ;;(use-package json-mode
 ;;:straight t)
@@ -315,6 +316,7 @@ Project %(projectile-project-root) "
 
 (use-package wgrep
   :straight t)
+
 (use-package elgrep
   :straight t)
 
@@ -327,7 +329,7 @@ Project %(projectile-project-root) "
 ;; uses magit-popup
 ;;(use-package swiper-helm
   ;; :straight t)
-  
+
 (use-package command-log-mode
   :straight t)
 
@@ -430,7 +432,17 @@ point reaches the beginning or end of the buffer, stop there."
 ;;  (helm-recentf))
 
 (use-package gcalcli-mode
-  :straight (gcalcli-mode :type git :host github :repo "gizmomogwai/gcalcli-mode"))
+  :straight (gcalcli-mode :type git :host github :repo "gizmomogwai/gcalcli-mode")
+  :config (progn
+            (setq gcalcli-mode-client-id "230398451995-h0f4frjhg6p1jcg4ivfg9rl1t2gl0c1o.apps.googleusercontent.com")
+            (setq gcalcli-mode-client-secret "UV-X38HVhjkkBIuUJJhoEtqh")))
+
+(use-package sdcv-mode
+  :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
+  :config (setq sdcv-dictionary-path "~/.stardict"))
+
+(use-package named-timer
+  :straight t)
 
 (provide 'init)
 
@@ -441,14 +453,50 @@ point reaches the beginning or end of the buffer, stop there."
 ;;  :after (avy)
 ;;  :config (global-set-key (kbd "M-z") #'zzz-to-char))
 ;;
+
 ;;(use-package rust-mode
-;;  :ensure t
+;;  :straight t)
 ;;  :mode "\\.rs\\'"
 ;;  :init (setq rust-format-on-save t))
-;;
+
+(c-add-style "my-d-mode"
+  '("cc-mode"
+     (c-basic-offset . 4)
+     (c-offsets-alist
+       (arglist-intro . +)
+       (arglist-close . 0)
+       (substatement-open . 0)
+       (statement-cont . +)
+       (inline-open . 0)
+       (label . +)
+       )))
+
+(defun my-d-mode-setup ()
+  "Setup indent according to dfmt's defaults."
+  (interactive)
+  (message "setting up d-mode indents")
+  (c-set-style "my-d-mode")
+  (setq show-trailing-whitespace t)
+  )
+
+
+(use-package d-mode
+  :straight t
+  :config (add-hook 'd-mode-hook 'my-d-mode-setup))
+
 ;;(use-package eglot
-;;  :ensure t
-;;  :init (add-hook 'rust-mode-hook 'eglot-ensure))
+;;  :straight t
+;;  :init (progn
+;;          (add-hook 'd-mode-hook 'eglot-ensure)
+;;          ))
+;;(add-to-list
+;;  'eglot-server-programs
+;;  '(d-mode . ("/Users/christiankoestlin/bin/serve-d")))
+
+(use-package lib-requires
+  :straight t)
+(libreq-requires-tree 'project)
+(libreq-requires-tree 'cl-generic)
 ;;
 ;;(defun my-before-switch-project-hook ()
 ;;  "Perform some action after switching Projectile projects."
@@ -500,4 +548,46 @@ point reaches the beginning or end of the buffer, stop there."
                        nil
                        (format "%s:%s" org-link--file org-link--line))))
   (insert (format "[[%s::%s][%s]]" (file-relative-name org-link--file (file-name-directory (buffer-file-name))) org-link--line link-text)))
+
+(use-package epa-file
+  :ensure nil ;; included with Emacs
+  :config (setq epa-file-encrypt-to '("christian.koestlin@gmail.com"))
+  :custom (epa-file-select-keys 'silent))
+
+
+;;(defun jump-to-org-agenda ()
+;;  "Open my org agenda."
+;;  (interactive)
+;;  (let (
+;;         (buffer (get-buffer "*Org Agenda*"))
+;;         window)
+;;    (if buffer
+;;        (if (setq window (get-buffer-window buffer))
+;;            (select-window window)
+;;          (if (called-interactively-p 'any)
+;;              (progn
+;;                (select-window (display-buffer buffer t t))
+;;                (org-fit-window-to-buffer)
+;;                )
+;;            (with-selected-window (display-buffer buffer)
+;;              (org-fit-window-to-buffer)
+;;              )))
+;;      (call-interactively 'org-agenda-list)))
+;;  )
+;;
+;;(named-timer-run :harass-myself
+;;  t
+;;  20
+;;  (lambda()
+;;    (when (< (org-user-idle-seconds) 20)
+;;      (if (and
+;;            (not (org-clocking-p))
+;;            (not (-contains-p '(:short-break :long-break) org-pomodoro-state)))
+;;        (progn
+;;          (message "Hey! you should be clocked into something.")
+;;          (run-with-idle-timer 300 t 'jump-to-org-agenda))
+;;        ))))
+;;      ;(ns/org-check-casual-time-today t)
+
+(toggle-frame-maximized)
 ;;; init.el ends here
