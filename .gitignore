@@ -1,1 +1,3 @@
 /.emacs.d/straight/build-cache.el
+.DS_Store
+*~

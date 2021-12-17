@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(auth-source-gpg-encrypt-to '("0456097ED35EBC82D36509A3C274FCF2D48F6953"))
  '(auth-sources '((:source "~/.gcalcli.gpg")))
- '(auto-save-file-name-transforms '((".*" "~/.emacs.d.autosave/" t)))
+ '(auto-save-file-name-transforms '((".*" "~/.emacs.d.autosave/\\1" t)))
  '(auto-save-list-file-prefix "~/.emacs.d.autosave/")
  '(backup-directory-alist '((".*" . "~/.emacs.d.backup/")))
  '(c-offsets-alist '((substatement-open . +)))
@@ -119,6 +119,7 @@
  '(ispell-dictionary "english")
  '(kill-whole-line t)
  '(lsp-rust-rls-command '("/Users/gizmo/.cargo/bin/rls"))
+ '(make-backup-files nil)
  '(markdown-command "pandoc")
  '(menu-bar-mode nil)
  '(ns-alternate-modifier 'none)
@@ -145,10 +146,10 @@
      '(clipmon char-menu typit typeit zzz-to-char ztree aggressive-indent org-htmlslidy minions whole-line-or-region hydra sublimity ecukes diff-hl git-timemachine json-mode plantuml-mode magit-org-todos key-chord expand-region helm-ag projectile exec-path-from-shell eglot undo-tree color-theme-zenburn lsp-ui-flycheck lsp-flycheck flycheck company editorconfig zenburn-theme helm magit use-package))
  '(plantuml-default-exec-mode 'jar)
  '(plantuml-jar-path "~/bin/plantuml.jar")
- '(projectile-cache-file "/Users/gizmo/tmp/projectile.cache")
+ '(projectile-cache-file "~/tmp/projectile.cache")
  '(projectile-completion-system 'helm)
  '(projectile-enable-caching t)
- '(projectile-indexing-method 'alien)
+ '(projectile-indexing-method 'native)
   '(projectile-project-root-files
      '("rebar.config" "project.clj" "build.boot" "deps.edn" "SConstruct" "pom.xml" "build.sbt" "gradlew" "build.gradle" ".ensime" "Gemfile" "requirements.txt" "setup.py" "pyproject.toml" "tox.ini" "composer.json" "Cargo.toml" "mix.exs" "stack.yaml" "info.rkt" "DESCRIPTION" "TAGS" "GTAGS" "configure.in" "configure.ac" "cscope.out" ".projectile" ".git"))
  '(projectile-require-project-root t)
@@ -159,7 +160,8 @@
  '(rg-show-columns t)
  '(ring-bell-function 'ignore)
   '(safe-local-variable-values
-     '((eval flycheck-cask-setup)
+     '((fldd-dub-configuration . "unittest")
+        (eval flycheck-cask-setup)
         (eval progn
           (goto-char
             (point-min))
@@ -184,12 +186,19 @@
  '(scroll-conservatively 10000)
  '(scroll-preserve-screen-position t)
  '(show-trailing-whitespace t)
+  '(tff/patterns-and-replacements
+     '(("\\(.*?\\)\\.h" "\\1.cpp")
+        ("\\(.*?\\)\\.cpp" "\\1.h")
+        ("\\(.*?\\)src\\(.*?\\)\\.cpp" "\\1test\\2_test.cpp")
+        ("\\(.*?\\)test\\(.*?\\)_test.cpp" "\\1src\\2.h")))
  '(tool-bar-mode nil)
  '(truncate-lines t)
  '(version-control t)
  '(view-read-only t)
  '(whitespace-style '(trailing tabs spaces indentation::space tab-mark))
- '(x-stretch-cursor t))
+ '(x-stretch-cursor t)
+  '(yas-snippet-dirs
+     '("/Users/christiankoestlin/.emacs.d/snippets" yasnippet-snippets-dir)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -122,7 +122,7 @@ Project %(projectile-project-root) "
   (interactive)
   (message "%s" (projectile-project-type))
   (pcase (projectile-project-type)
-    ('dmd (shell-command "find . -name \"*.d\" | xargs dub run dfmt -- -i"))))
+    ('dlang (shell-command "dub run dfmt -- -i ."))))
 
 (use-package helm
   :straight t
@@ -139,13 +139,14 @@ Project %(projectile-project-root) "
 
 (use-package projectile
   :straight t
-  :config (projectile-mode 1)
+  :config
+  (projectile-mode 1)
   (projectile-register-project-type
-    'dmd
+    'dlang
     '("dub.sdl")
-    :compile "source ~/dlang/dmd-2.091.0/activate.fish && dub build"
-    :test "source ~/dlang/dmd-2.091.0/activate.fish && dub test"
-    :run "source ~/dlang/dmd-2.091.0/activate.fish && dub build && dub run dscanner -- --styleCheck . || true && dub run -- . .. ../.."
+    :compile "source ~/dlang/dmd-2.098.0/activate.fish && dub build"
+    :test "source ~/dlang/dmd-2.098.0/activate.fish && dub test"
+    :run "source ~/dlang/dmd-2.098.0/activate.fish && dub run dfmt -- -i . && dub build && dub run dscanner -- --styleCheck . || true && dub run --"
   ))
 
 ;;(use-package projectile-rails
@@ -219,8 +220,10 @@ Project %(projectile-project-root) "
 (use-package yasnippet
   :straight t
   :config (yas-global-mode 1))
+
 (use-package yasnippet-snippets
   :straight t)
+
 (use-package yafolding
   :straight (yafolding :type git :host github :repo "vindarel/yafolding.el")
   :config (progn
@@ -324,6 +327,9 @@ Project %(projectile-project-root) "
   :straight t)
 
 (use-package counsel
+  :straight t)
+
+(use-package dired+
   :straight t)
 
 ;; uses magit-popup
@@ -589,5 +595,33 @@ point reaches the beginning or end of the buffer, stop there."
 ;;        ))))
 ;;      ;(ns/org-check-casual-time-today t)
 
+(defun format-old-source ()
+  "Format old sources that contain carriage return and tabs."
+  (interactive)
+  (beginning-of-buffer)
+  (replace-string "\r" "")
+  (beginning-of-buffer)
+  (replace-string "\t" "  ")
+  (beginning-of-buffer)
+  (delete-trailing-whitespace))
+
+(defun ruthless-kill-line ()
+  "Delete current line without adding to `kill-ring`."
+  (interactive)
+  (delete-region (point) (1+ (line-end-position))))
+(global-set-key (kbd "C-S-k") 'ruthless-kill-line)
+
 (toggle-frame-maximized)
+
+(add-to-list
+  'save-some-buffers-action-alist
+  `(?r ,(lambda (buf) (with-current-buffer buf
+                        (when
+                          (and (buffer-file-name) (file-exists-p (buffer-file-name)) (buffer-modified-p))
+                          (revert-buffer t t t))))
+       ,(purecopy "revert buffer")))
+
 ;;; init.el ends here
+
+
+
