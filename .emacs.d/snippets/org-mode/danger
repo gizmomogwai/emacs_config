@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: danger block
+# key: danger
+# --
+#+begin_danger
+$0
+#+end_danger

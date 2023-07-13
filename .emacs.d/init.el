@@ -4,6 +4,8 @@
 ;;; Code:
 
 (defvar bootstrap-version)
+
+(setq straight-disable-native-compile t)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
        (bootstrap-version 5))
@@ -21,8 +23,8 @@
                                         ;(add-to-list 'default-frame-alist '(font . "Fira Code Retina-15"))
                                         ;(add-to-list 'initial-frame-alist '(font . "Hack-15"))
                                         ;(add-to-list 'default-frame-alist '(font . "Hack-15"))
-(add-to-list 'initial-frame-alist '(font . "Iosevka-15"))
-(add-to-list 'default-frame-alist '(font . "Iosevka-15"))
+(add-to-list 'initial-frame-alist '(font . "Iosevka Term-15"))
+(add-to-list 'default-frame-alist '(font . "Iosevka Term-15"))
                                         ;(add-to-list 'initial-frame-alist '(font . "Envy Code R-15"))
                                         ;(add-to-list 'default-frame-alist '(font . "Envy Code R-15"))
                                         ;(toggle-frame-maximized)
@@ -30,20 +32,37 @@
 
 (straight-use-package 'use-package)
 
-(use-package project
-  :straight t)
+;;(use-package project
+;;  :straight t)
 
 ;;(use-package org-mode
-;;  :straight t)
-;;  :config (progn
-;;            (defalias 'D-mode 'd-mode)
-;;            (require 'ob-C)))
+;;  :straight t
+;;  :config
+;;    (defalias 'D-mode 'd-mode)
+;;    (require 'ob-C))
+
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
+(with-eval-after-load 'org
+  (org-babel-do-load-languages 'org-babel-load-languages
+    '(
+       (shell . t)
+       (dot . t)
+       ))
+  (org-link-set-parameters "tel" :export #'org-tel-export)
+)
+
+(defun org-tel-export (link description format)
+  "Export a tel LINK with DESCRIPTION from Org files to FORMAT."
+  (let ((desc (or description link)))
+    (pcase format
+      (`html (format "<a target=\"_blank\" href=\"tel:%s\">%s</a>" link desc))
+      )))
 
 (use-package magit
   :straight t)
 
 (use-package git-timemachine
-  :straight t)
+  :straight (git-timemachine :type git :host nil :repo "https://codeberg.org/pidu/git-timemachine.git"))
 
 (use-package zenburn-theme
   :straight t
@@ -67,6 +86,11 @@
 (use-package editorconfig
   :straight t
   :config (editorconfig-mode 1))
+
+(use-package package-lint
+  :straight t)
+(use-package pkg-info
+  :straight t)
 
 (use-package minions
   :straight t
@@ -102,7 +126,7 @@
   :config
   (defhydra hydra-projectile (:columns 4)
     "
-Project %(projectile-project-root) "
+Project %(projectile-project-root)"
     ("b" projectile-compile-project "Build")
     ("c" projectile-invalidate-cache "Clear Cache")
     ("f" projectile-find-file "Find File")
@@ -134,8 +158,13 @@ Project %(projectile-project-root) "
 (use-package char-menu
   :straight t)
 
-(use-package undo-tree
+(use-package bufler
   :straight t)
+
+(use-package undo-tree
+  :straight t
+  :config (global-undo-tree-mode t))
+
 
 (use-package projectile
   :straight t
@@ -144,14 +173,16 @@ Project %(projectile-project-root) "
   (projectile-register-project-type
     'dlang
     '("dub.sdl")
-    :compile "source ~/dlang/dmd-2.098.0/activate.fish && dub build"
-    :test "source ~/dlang/dmd-2.098.0/activate.fish && dub test"
-    :run "source ~/dlang/dmd-2.098.0/activate.fish && dub run dfmt -- -i . && dub build && dub run dscanner -- --styleCheck . || true && dub run --"
+    :compile "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub build"
+    :test "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub test"
+    :run "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub run dfmt -- -i . && dub build && dub run dscanner -- --styleCheck . || true && dub run --"
   ))
 
-;;(use-package projectile-rails
-;;  :straight t
-;;  :config (projectile-rails-global-mode 1))
+(require 'compile)
+(add-to-list 'compilation-error-regexp-alist-alist
+             '(d-scanner
+               "\\(.*?\\)(\\(.*?\\):\\(.*?\\))\\[\\(.*?\\)\\]:"
+               1 2 3 2))
 
 (use-package helm-projectile
   :straight t)
@@ -174,6 +205,12 @@ Project %(projectile-project-root) "
   :straight t
   :config (global-flycheck-mode 1)
   :after (exec-path-from-shell))
+
+(use-package flycheck-pos-tip
+  :straight t
+  :config
+    (with-eval-after-load 'flycheck
+      (flycheck-pos-tip-mode)))
 
 ;;(use-package helm-ag
 ;;  :straight t
@@ -219,10 +256,22 @@ Project %(projectile-project-root) "
 
 (use-package yasnippet
   :straight t
-  :config (yas-global-mode 1))
+  :config
+      (yas-global-mode 1)
+    )
 
-(use-package yasnippet-snippets
-  :straight t)
+;;(use-package yasnippet-snippets
+;;  :straight t)
+(defun company-mode/backend-with-yas (backend)
+  "Add yas as backend to the given BACKEND."
+  (if (or
+        (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
+(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
 
 (use-package yafolding
   :straight (yafolding :type git :host github :repo "vindarel/yafolding.el")
@@ -271,8 +320,6 @@ Project %(projectile-project-root) "
 
 ;;(use-package highlight-symbol
 ;;  :straight t)
-;;(use-package git-timemachine
-;;:straight t)
 
 (use-package diff-hl
   :straight t
@@ -490,19 +537,50 @@ point reaches the beginning or end of the buffer, stop there."
   :straight t
   :config (add-hook 'd-mode-hook 'my-d-mode-setup))
 
-;;(use-package eglot
-;;  :straight t
-;;  :init (progn
-;;          (add-hook 'd-mode-hook 'eglot-ensure)
-;;          ))
-;;(add-to-list
-;;  'eglot-server-programs
-;;  '(d-mode . ("/Users/christiankoestlin/bin/serve-d")))
+(use-package helm-dash
+  :straight t)
 
+(use-package dwim-shell-command
+  :straight t)
+(use-package eglot
+  :straight t)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all")))
+
+;;(use-package evil
+;;  :straight t)
+;;(use-package general
+;;  :straight t)
+;;
+;;  :config
+;;    (progn
+;;      (general-define-key
+;;        :states '(normal visual insert emacs)
+;;        :prefix "SPC"
+;;        :non-normal-prefix "M-SPC"
+;;        "'" '(iterm-focus :which-key "iterm")
+;;        "?" '(iterm-goto-filedir-or-home :which-key "iterm - goto dir")
+;;        "/" '(counsel-ag :wich-key "ag")
+;;        "TAB" '(ivy-switch-buffer :which-key "prev buffer")
+;;        "." '(avy-goto-word-or-subword-1  :which-key "go to word")
+;;        "SPC" '(counsel-M-x :which-key "M-x")
+;;        "a" '(hydra-launcher/body :which-key "Applications")
+;;        "b" '(hydra-buffer/body t :which-key "Buffer")
+;;        "c" '(:ignore t :which-key "Comment")
+;;        "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
+;;        "w" '(hydra-window/body :which-key "Window")
+;;        "f" '(:ignore t :which-key "Files")
+;;        "fd" '(counsel-git :which-key "find in git dir")
+;;        ;; ...
+;;        )
+;;      )
+;;  )
 (use-package lib-requires
   :straight t)
 (libreq-requires-tree 'project)
 (libreq-requires-tree 'cl-generic)
+
 ;;
 ;;(defun my-before-switch-project-hook ()
 ;;  "Perform some action after switching Projectile projects."
@@ -522,7 +600,9 @@ point reaches the beginning or end of the buffer, stop there."
 (with-eval-after-load 'org
   (org-babel-do-load-languages 'org-babel-load-languages
     '(
+       (shell . t)
        (ruby . t)
+       (C . t)
        (plantuml . t))))
 
 (defun reload-init ()
@@ -621,7 +701,68 @@ point reaches the beginning or end of the buffer, stop there."
                           (revert-buffer t t t))))
        ,(purecopy "revert buffer")))
 
+
+(run-at-time t (* 5 60) 'recentf-save-list)
+
+
+(defun dlang-build--find-root ()
+  "Find dlang-build root directory."
+  (expand-file-name (locate-dominating-file (buffer-file-name) "dub.sdl")))
+(defun dlang-build--calc-prefix ()
+  "Calculate prefix string to include in the error regex so that the matched file is relative to the current buffer used by flycheck."
+  (file-name-directory (string-replace (dlang-build--find-root) "" (buffer-file-name))))
+
+(defun dlang-build-error-parser (output checker buffer)
+  "Parse OUTPUT.
+
+CHECKER and BUFFER denoted the CHECKER that returned OUTPUT and
+the BUFFER that was checked respectively."
+  (let* (
+          (errors nil)
+          (prefix (dlang-build--calc-prefix))
+          (regexp-query (rx line-start (literal prefix)
+                          (group-n 1 (minimal-match (one-or-more not-newline))) "(" ;; filename
+                          (group-n 2 (minimal-match (one-or-more digit))) "," ;; line
+                          (group-n 3 (minimal-match (one-or-more digit))) "): " ;; column
+                          (group-n 4 (or "Warning" "Error")) ": " ;; level
+                          (group-n 5 (one-or-more not-newline)) ;; message
+                          line-end))
+          )
+    (-map (lambda(match)
+            (flycheck-error-new
+              :line (flycheck-string-to-number-safe (nth 2 match))
+              :column (flycheck-string-to-number-safe (nth 3 match))
+              :level (pcase (nth 4 match)
+                (`"Error"   'error)
+                (`"Warning" 'warning)
+                (`"Info"    'info)
+                (_          'error))
+              :message (nth 5 match)
+              :buffer buffer
+              :checker checker))
+      (s-match-strings-all regexp-query output))))
+
+;;(flycheck-define-checker dlang-build
+;;  "An opinionated dlang checker."
+;;  :command ("~/bin/d" "--color=off" "test" "--coverage")
+;;  :standard-input t
+;;  :error-parser dlang-build-error-parser
+;;  :modes (d-mode))
+
+;;(add-to-list 'flycheck-disabled-checkers 'd-dmd)
+(add-to-list 'flycheck-checkers 'dlang-build)
+(setq flycheck-error-list-format
+  [
+    ("File" 20)
+    ("Line" 5 flycheck-error-list-entry-< :right-align t)
+    ("Col" 3 nil :right-align t)
+    ("Level" 8 flycheck-error-list-entry-level-<)
+    ("ID" 6 t)
+    (#("Message (Checker)" 0 7
+        (face flycheck-error-list-error-message)
+        9 16
+        (face flycheck-error-list-checker-name))
+      0 t)])
+(global-set-key (kbd "<f7>") 'previous-error)
+(global-set-key (kbd "<f8>") 'next-error)
 ;;; init.el ends here
-
-
-
