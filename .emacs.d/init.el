@@ -5,7 +5,7 @@
 
 (defvar bootstrap-version)
 
-(setq straight-disable-native-compile t)
+;;(setq straight-disable-native-compile t)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
        (bootstrap-version 5))
@@ -29,6 +29,7 @@
                                         ;(add-to-list 'default-frame-alist '(font . "Envy Code R-15"))
                                         ;(toggle-frame-maximized)
 (setq-default header-line-format '(:eval (which-function)))
+
 
 (straight-use-package 'use-package)
 
@@ -209,8 +210,7 @@ Project %(projectile-project-root)"
 (use-package flycheck-pos-tip
   :straight t
   :config
-    (with-eval-after-load 'flycheck
-      (flycheck-pos-tip-mode)))
+    (with-eval-after-load 'flycheck (flycheck-pos-tip-mode)))
 
 ;;(use-package helm-ag
 ;;  :straight t
@@ -691,8 +691,6 @@ point reaches the beginning or end of the buffer, stop there."
   (delete-region (point) (1+ (line-end-position))))
 (global-set-key (kbd "C-S-k") 'ruthless-kill-line)
 
-(toggle-frame-maximized)
-
 (add-to-list
   'save-some-buffers-action-alist
   `(?r ,(lambda (buf) (with-current-buffer buf
@@ -703,23 +701,24 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 (run-at-time t (* 5 60) 'recentf-save-list)
+(toggle-frame-maximized)
 
 
-(defun dlang-build--find-root ()
+(defun dlang--find-root ()
   "Find dlang-build root directory."
   (expand-file-name (locate-dominating-file (buffer-file-name) "dub.sdl")))
-(defun dlang-build--calc-prefix ()
+(defun dlang--calc-prefix ()
   "Calculate prefix string to include in the error regex so that the matched file is relative to the current buffer used by flycheck."
-  (file-name-directory (string-replace (dlang-build--find-root) "" (buffer-file-name))))
+  (file-name-directory (string-replace (dlang--find-root) "" (buffer-file-name))))
 
-(defun dlang-build-error-parser (output checker buffer)
+(defun dlang-error-parser (output checker buffer)
   "Parse OUTPUT.
 
 CHECKER and BUFFER denoted the CHECKER that returned OUTPUT and
 the BUFFER that was checked respectively."
   (let* (
           (errors nil)
-          (prefix (dlang-build--calc-prefix))
+          (prefix (dlang--calc-prefix))
           (regexp-query (rx line-start (literal prefix)
                           (group-n 1 (minimal-match (one-or-more not-newline))) "(" ;; filename
                           (group-n 2 (minimal-match (one-or-more digit))) "," ;; line
@@ -742,15 +741,23 @@ the BUFFER that was checked respectively."
               :checker checker))
       (s-match-strings-all regexp-query output))))
 
-;;(flycheck-define-checker dlang-build
-;;  "An opinionated dlang checker."
-;;  :command ("~/bin/d" "--color=off" "test" "--coverage")
-;;  :standard-input t
-;;  :error-parser dlang-build-error-parser
-;;  :modes (d-mode))
+(flycheck-define-checker dlang-test-coverage
+  "Check testcoverage of dlang/dub projects."
+  :command ("~/bin/d" "--color=off" "test" "--coverage")
+  :standard-input t
+  :error-parser dlang-error-parser
+  :modes (d-mode))
 
-;;(add-to-list 'flycheck-disabled-checkers 'd-dmd)
-(add-to-list 'flycheck-checkers 'dlang-build)
+(flycheck-define-checker dlang-build
+  "Check build of dlang/dub projects."
+  :command ("~/bin/d" "--color=off" "build")
+  :standard-input t
+  :error-parser dlang-error-parser
+  :modes (d-mode))
+(add-to-list 'flycheck-disabled-checkers 'd-dmd)
+(add-to-list 'flycheck-checkers 'dlang-test-coverage) ;; then care about test coverage
+(add-to-list 'flycheck-checkers 'dlang-build) ;; first make it build
+(flycheck-add-next-checker 'dlang-build (cons 'info 'dlang-test-coverage))
 (setq flycheck-error-list-format
   [
     ("File" 20)
