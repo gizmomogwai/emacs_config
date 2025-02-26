@@ -2,7 +2,7 @@
 # name: toString ...
 # key: toString
 # --
-void toString(scope void delegate (scope const(char)[]) sink, string fmt)
+override void toString(Sink, Format)(Sink sink, Format format) const
 {
     $1
 }

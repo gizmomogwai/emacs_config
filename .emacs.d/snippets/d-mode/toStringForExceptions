@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: toStringForExceptions ...
+# key: toStringForExceptions
+# --
+override void toString(scope void delegate(in char[]) sink) const
+{
+    $1
+}

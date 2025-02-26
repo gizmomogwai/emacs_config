@@ -30,7 +30,6 @@
                                         ;(toggle-frame-maximized)
 (setq-default header-line-format '(:eval (which-function)))
 
-
 (straight-use-package 'use-package)
 
 ;;(use-package project
@@ -62,6 +61,10 @@
 (use-package magit
   :straight t)
 
+(use-package ox-reveal
+  :straight (ox-reveal :type git :host github :repo "yjwen/org-reveal")
+  :config (require 'ox-reveal))
+
 (use-package git-timemachine
   :straight (git-timemachine :type git :host nil :repo "https://codeberg.org/pidu/git-timemachine.git"))
 
@@ -76,9 +79,6 @@
 (use-package tff
   :straight (tff :type git :host github :repo "gizmomogwai/tff")
   :config (global-set-key (kbd "C-1") 'tff))
-
-;;(use-package org-kanban
-;;:straight t)
 
                                         ;(use-package magit-org-todos
 ;  :straight t
@@ -147,7 +147,7 @@ Project %(projectile-project-root)"
   (interactive)
   (message "%s" (projectile-project-type))
   (pcase (projectile-project-type)
-    ('dlang (shell-command "dub run dfmt -- -i ."))))
+    ('dlang (shell-command "~/bin/d run dfmt -- -i ."))))
 
 (use-package helm
   :straight t
@@ -174,9 +174,9 @@ Project %(projectile-project-root)"
   (projectile-register-project-type
     'dlang
     '("dub.sdl")
-    :compile "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub build"
-    :test "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub test"
-    :run "set -x MACOSX_DEPLOYMENT_TARGET 11 && source ~/dlang/ldc-1.32.2/activate.fish && dub run dfmt -- -i . && dub build && dub run dscanner -- --styleCheck . || true && dub run --"
+    :compile "~/bin/d build"
+    :test "~/bin/d test && ~/bin/d run dscanner -- --errorFormat=digitalmars --styleCheck"
+    :run "~/bin/d run"
   ))
 
 (require 'compile)
@@ -296,8 +296,8 @@ Project %(projectile-project-root)"
 ;;  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
 ;;  (add-hook 'css-mode-hook 'emmet-mode))
 
-(use-package org-pomodoro
-  :straight t)
+;;(use-package org-pomodoro
+;;  :straight t)
 
 (use-package plantuml-mode
   :straight t
@@ -507,8 +507,8 @@ point reaches the beginning or end of the buffer, stop there."
 ;;  :config (global-set-key (kbd "M-z") #'zzz-to-char))
 ;;
 
-;;(use-package rust-mode
-;;  :straight t)
+(use-package rust-mode
+  :straight t)
 ;;  :mode "\\.rs\\'"
 ;;  :init (setq rust-format-on-save t))
 
@@ -532,6 +532,10 @@ point reaches the beginning or end of the buffer, stop there."
   (setq show-trailing-whitespace t)
   )
 
+;;(use-package mini-modeline
+;;  :straight t
+;;  :config (setq mini-modeline-mode t))
+
 
 (use-package d-mode
   :straight t
@@ -544,6 +548,9 @@ point reaches the beginning or end of the buffer, stop there."
   :straight t)
 (use-package eglot
   :straight t)
+
+(use-package org-kanban
+  :straight (org-kanban :type git :host github :repo "gizmomogwai/org-kanban"))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all")))
@@ -580,6 +587,15 @@ point reaches the beginning or end of the buffer, stop there."
   :straight t)
 (libreq-requires-tree 'project)
 (libreq-requires-tree 'cl-generic)
+
+(use-package jinx
+  :straight t
+  ;;:hook (emacs-startup . global-jinx-mode)
+  :bind (("M-$" . jinx-correct)
+         ("C-M-$" . jinx-languages)))
+
+;;(use-package codium
+;;  :straight (codeium :type git :host github :repo "Exafunction/codeium.el"))
 
 ;;
 ;;(defun my-before-switch-project-hook ()
@@ -619,6 +635,10 @@ point reaches the beginning or end of the buffer, stop there."
 (add-hook 'compilation-filter-hook
   (lambda() (when (eq major-mode 'compilation-mode)
               (ansi-color-apply-on-region compilation-filter-start (point-max)))))
+(defun display-ansi-colors ()
+  "Show ansi colors in any buffer."
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
 
 (defun org-link-mark-file-and-line ()
   "Copy current file and line to org-link."
@@ -639,6 +659,7 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure nil ;; included with Emacs
   :config (setq epa-file-encrypt-to '("christian.koestlin@gmail.com"))
   :custom (epa-file-select-keys 'silent))
+
 
 
 ;;(defun jump-to-org-agenda ()
@@ -772,4 +793,21 @@ the BUFFER that was checked respectively."
       0 t)])
 (global-set-key (kbd "<f7>") 'previous-error)
 (global-set-key (kbd "<f8>") 'next-error)
+
+;; minor mode to colorize buffers with ansi escape sequences
+;; https://stackoverflow.com/questions/23378271/how-do-i-display-ansi-color-codes-in-emacs-for-any-mode
+(defun ansi-color-after-scroll (window start)
+  "Used by ansi-color-mode minor mode.  Apply ansi formatting on WINDOW starting from START."
+  (ansi-color-apply-on-region start (window-end window t) t))
+
+(define-minor-mode ansi-color-mode
+  "A very primitive minor mode to view log files containing ANSI color codes."
+  :global nil
+  :lighter ""
+  (if ansi-color-mode
+      (progn
+        (ansi-color-apply-on-region (window-start) (window-end) t)
+        (add-hook 'window-scroll-functions 'ansi-color-after-scroll 80 t))
+    (remove-hook 'window-scroll-functions 'ansi-color-after-scroll t)))
+
 ;;; init.el ends here
