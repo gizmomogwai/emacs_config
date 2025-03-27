@@ -32,6 +32,9 @@
 
 (straight-use-package 'use-package)
 
+(use-package org :straight (:type built-in))
+
+
 ;;(use-package project
 ;;  :straight t)
 
@@ -80,9 +83,9 @@
   :straight (tff :type git :host github :repo "gizmomogwai/tff")
   :config (global-set-key (kbd "C-1") 'tff))
 
-                                        ;(use-package magit-org-todos
-;  :straight t
-;  :config (magit-org-todos-autoinsert))
+(use-package eplot
+  :straight (eplot :type git :host github :repo "larsmagne/eplot")
+  )
 
 (use-package editorconfig
   :straight t
@@ -147,7 +150,7 @@ Project %(projectile-project-root)"
   (interactive)
   (message "%s" (projectile-project-type))
   (pcase (projectile-project-type)
-    ('dlang (shell-command "~/bin/d run dfmt -- -i ."))))
+    ('dlang (shell-command "~/bin/d run dfmt -- -i . && ~/bin/d run importsort-d -- --ignore-case --inplace --recursive ."))))
 
 (use-package helm
   :straight t
@@ -190,6 +193,11 @@ Project %(projectile-project-root)"
 
 (use-package protobuf-mode
   :straight t)
+;;(use-package orderless
+;;  :straight t
+;;  :custom
+;;    (completion-styles '(orderless basic))
+;;    (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package company
   :straight t
@@ -258,7 +266,10 @@ Project %(projectile-project-root)"
   :straight t
   :config
       (yas-global-mode 1)
-    )
+  )
+
+(use-package yasnippet-snippets
+  :straight t)
 
 ;;(use-package yasnippet-snippets
 ;;  :straight t)
@@ -296,8 +307,8 @@ Project %(projectile-project-root)"
 ;;  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
 ;;  (add-hook 'css-mode-hook 'emmet-mode))
 
-;;(use-package org-pomodoro
-;;  :straight t)
+(use-package org-pomodoro
+  :straight t)
 
 (use-package plantuml-mode
   :straight t
@@ -362,7 +373,7 @@ Project %(projectile-project-root)"
   :config (which-key-mode 1))
 
 (use-package deadgrep
-  :straight t)
+  :straight (deadgrep :type git :host github :repo "Wilfred/deadgrep"))
 
 (use-package wgrep
   :straight t)
@@ -397,10 +408,6 @@ Project %(projectile-project-root)"
 (require 'hideshow)
 (require 'sgml-mode)
 (require 'nxml-mode)
-
-(use-package docker
-  :straight t
-  :bind ("C-c d" . docker))
 
 (add-to-list 'hs-special-modes-alist
   '(nxml-mode
@@ -511,7 +518,7 @@ point reaches the beginning or end of the buffer, stop there."
   :straight t)
 ;;  :mode "\\.rs\\'"
 ;;  :init (setq rust-format-on-save t))
-
+​
 (c-add-style "my-d-mode"
   '("cc-mode"
      (c-basic-offset . 4)
@@ -551,9 +558,12 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package org-kanban
   :straight (org-kanban :type git :host github :repo "gizmomogwai/org-kanban"))
+  :straight t)
 
 (with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all")))
+  (progn (add-to-list 'eglot-server-programs '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all"))
+	 (add-to-list 'eglot-server-programs '((rust-mode) . ("rust-analyzer")))
+    ))
 
 ;;(use-package evil
 ;;  :straight t)
@@ -661,6 +671,8 @@ point reaches the beginning or end of the buffer, stop there."
   :custom (epa-file-select-keys 'silent))
 
 
+(use-package ox-gfm
+  :straight t) 
 
 ;;(defun jump-to-org-agenda ()
 ;;  "Open my org agenda."
@@ -809,5 +821,9 @@ the BUFFER that was checked respectively."
         (ansi-color-apply-on-region (window-start) (window-end) t)
         (add-hook 'window-scroll-functions 'ansi-color-after-scroll 80 t))
     (remove-hook 'window-scroll-functions 'ansi-color-after-scroll t)))
+(defun add-asciiart-comment-header (string)
+  "Insert an asciiart comment header for STRING."
+  (interactive "sString for header: ")
+  (insert (format "/* ----- %s %s */" string (make-string (- 80 (length string)) ?-))))
 
 ;;; init.el ends here

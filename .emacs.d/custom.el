@@ -55,7 +55,7 @@
     '("420459d6eeb45aadf5db5fbcc3d6990b65141c104911f7359454fc29fa9d87a0"
        "190a9882bef28d7e944aa610aa68fe1ee34ecea6127239178c7ac848754992df"
        default))
- '(deadgrep-executable "rg")
+ '(deadgrep-executable "/opt/homebrew/bin/rg")
  '(debug-on-error nil)
  '(delete-old-versions t)
  '(dired-use-ls-dired nil)
@@ -117,7 +117,8 @@
        (yaml-mode yaml-indent-offset)))
  '(emmet-indentation 2)
  '(exec-path
-    '("/Users/christiankoestlin/dlang/dmd-2.100.0/osx/bin"
+    '("/opt/homebrew/bin"
+       "/Users/christiankoestlin/dlang/dmd-2.100.0/osx/bin"
        "/Users/chrisitankoestlin/.cargo/bin" "/opt/homebrew/bin/dot"
        "/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin"
        "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_10"
@@ -159,9 +160,14 @@
  '(org-confirm-babel-evaluate nil)
  '(org-export-timestamp-file nil)
  '(org-file-apps
-    '((auto-mode . emacs) ("\\.mm\\'" . default)
-       ("\\.x?html?\\'" . default) ("\\.pdf\\'" . default)
-       (directory . emacs) ("\\.md" . emacs)))
+   '(
+     (auto-mode . emacs)
+     ("\\.mm\\'" . default)
+     ("\\.x?html?\\'" . default)
+     ("\\.pdf\\'" . default)
+     ("\\.md" . emacs)
+     (directory . emacs)
+     ))
  '(org-log-done 'note)
  '(org-plantuml-jar-path "~/bin/plantuml.jar")
  '(org-pomodoro-length 20)
