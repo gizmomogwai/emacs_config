@@ -31,12 +31,10 @@
 (setq-default header-line-format '(:eval (which-function)))
 
 (straight-use-package 'use-package)
+(straight-use-package 'project)
 
 (use-package org :straight (:type built-in))
 
-
-;;(use-package project
-;;  :straight t)
 
 ;;(use-package org-mode
 ;;  :straight t
@@ -169,6 +167,8 @@ Project %(projectile-project-root)"
   :straight t
   :config (global-undo-tree-mode t))
 
+(use-package project
+  :straight t)
 
 (use-package projectile
   :straight t
@@ -516,9 +516,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package rust-mode
   :straight t)
-;;  :mode "\\.rs\\'"
+;; :mode "\\.rs\\'"
 ;;  :init (setq rust-format-on-save t))
-​
+
 (c-add-style "my-d-mode"
   '("cc-mode"
      (c-basic-offset . 4)
@@ -553,16 +553,21 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package dwim-shell-command
   :straight t)
-(use-package eglot
-  :straight t)
 
 (use-package org-kanban
   :straight (org-kanban :type git :host github :repo "gizmomogwai/org-kanban"))
-  :straight t)
+
+(use-package eglot-x
+  :straight (eglot-x :type git :host github :repo "nemethf/eglot-x"))
 
 (with-eval-after-load 'eglot
-  (progn (add-to-list 'eglot-server-programs '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all"))
-	 (add-to-list 'eglot-server-programs '((rust-mode) . ("rust-analyzer")))
+  (progn
+    (add-to-list 'eglot-server-programs
+      '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all"))
+    (add-to-list 'eglot-server-programs
+      '((rust-mode) . ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))
+    (require 'eglot-x)
+    (eglot-x-setup)
     ))
 
 ;;(use-package evil
@@ -672,7 +677,11 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 (use-package ox-gfm
-  :straight t) 
+  :straight t)
+
+
+(use-package eat
+  :straight (eat :type git :host codeberg :repo "akib/emacs-eat"))
 
 ;;(defun jump-to-org-agenda ()
 ;;  "Open my org agenda."
