@@ -23,13 +23,14 @@
                                         ;(add-to-list 'default-frame-alist '(font . "Fira Code Retina-15"))
                                         ;(add-to-list 'initial-frame-alist '(font . "Hack-15"))
                                         ;(add-to-list 'default-frame-alist '(font . "Hack-15"))
-(add-to-list 'initial-frame-alist '(font . "Iosevka Term-15"))
-(add-to-list 'default-frame-alist '(font . "Iosevka Term-15"))
+(add-to-list 'initial-frame-alist '(font . "Iosevka Term-19"))
+(add-to-list 'default-frame-alist '(font . "Iosevka Term-19"))
                                         ;(add-to-list 'initial-frame-alist '(font . "Envy Code R-15"))
                                         ;(add-to-list 'default-frame-alist '(font . "Envy Code R-15"))
                                         ;(toggle-frame-maximized)
 (setq-default header-line-format '(:eval (which-function)))
 
+(straight-use-package 'project)
 (straight-use-package 'use-package)
 (straight-use-package 'project)
 
@@ -60,7 +61,7 @@
       )))
 
 (use-package magit
-  :straight t)
+  :straight (magit :type git :host github :repo "magit/magit"))
 
 (use-package ox-reveal
   :straight (ox-reveal :type git :host github :repo "yjwen/org-reveal")
@@ -191,8 +192,8 @@ Project %(projectile-project-root)"
 (use-package helm-projectile
   :straight t)
 
-(use-package protobuf-mode
-  :straight t)
+;;(use-package protobuf-mode
+;;  :straight t)
 ;;(use-package orderless
 ;;  :straight t
 ;;  :custom
@@ -675,10 +676,8 @@ point reaches the beginning or end of the buffer, stop there."
   :config (setq epa-file-encrypt-to '("christian.koestlin@gmail.com"))
   :custom (epa-file-select-keys 'silent))
 
-
 (use-package ox-gfm
   :straight t)
-
 
 (use-package eat
   :straight (eat :type git :host codeberg :repo "akib/emacs-eat"))
@@ -830,6 +829,7 @@ the BUFFER that was checked respectively."
         (ansi-color-apply-on-region (window-start) (window-end) t)
         (add-hook 'window-scroll-functions 'ansi-color-after-scroll 80 t))
     (remove-hook 'window-scroll-functions 'ansi-color-after-scroll t)))
+
 (defun add-asciiart-comment-header (string)
   "Insert an asciiart comment header for STRING."
   (interactive "sString for header: ")
