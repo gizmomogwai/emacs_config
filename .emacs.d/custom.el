@@ -48,6 +48,7 @@
        gcov-never-called perl--Pod::Checker perl--Test perl--Test2
        perl--Test::Harness weblint guile-file guile-line))
  '(compilation-scroll-output 'first-error)
+ '(compilation-skip-threshold 2)
  '(confirm-nonexistent-file-or-buffer nil)
  '(create-lockfiles nil)
  '(custom-enabled-themes '(zenburn))

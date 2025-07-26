@@ -30,14 +30,15 @@
                                         ;(toggle-frame-maximized)
 (setq-default header-line-format '(:eval (which-function)))
 
-(straight-use-package 'project)
 (straight-use-package 'use-package)
-(straight-use-package 'project)
+;;(straight-use-package 'project)
 
 (use-package org :straight (:type built-in))
 
-
-;;(use-package org-mode
+(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+(use-package org-mode
+  :ensure nil ;; use builtin
+  :hook (org-mode . turn-on-auto-fill))
 ;;  :straight t
 ;;  :config
 ;;    (defalias 'D-mode 'd-mode)
@@ -63,12 +64,12 @@
 (use-package magit
   :straight (magit :type git :host github :repo "magit/magit"))
 
-(use-package ox-reveal
-  :straight (ox-reveal :type git :host github :repo "yjwen/org-reveal")
-  :config (require 'ox-reveal))
+;;(use-package ox-reveal
+;;  :straight (ox-reveal :type git :host github :repo "yjwen/org-reveal")
+;;  :config (require 'ox-reveal))
 
 (use-package git-timemachine
-  :straight (git-timemachine :type git :host nil :repo "https://codeberg.org/pidu/git-timemachine.git"))
+  :straight (git-timemachine :type git :host nil :repo "https://codeberg.org/pidu/git-timemachine"))
 
 (use-package zenburn-theme
   :straight t
@@ -92,15 +93,15 @@
 
 (use-package package-lint
   :straight t)
-(use-package pkg-info
-  :straight t)
+;;(use-package pkg-info
+;;  :straight t)
 
 (use-package minions
   :straight t
   :config (minions-mode 1))
 
-(use-package helpful
-  :straight t)
+;;(use-package helpful
+;;  :straight t)
 
 ;;(use-package docker
 ;;  :straight t)
@@ -161,15 +162,12 @@ Project %(projectile-project-root)"
 (use-package char-menu
   :straight t)
 
-(use-package bufler
-  :straight t)
+;;(use-package bufler
+;;  :straight t)
 
 (use-package undo-tree
   :straight t
   :config (global-undo-tree-mode t))
-
-(use-package project
-  :straight t)
 
 (use-package projectile
   :straight t
@@ -208,8 +206,6 @@ Project %(projectile-project-root)"
   :straight t
   :config (exec-path-from-shell-initialize))
 
-(use-package yaml-mode
-  :straight t)
 
 (use-package flycheck
   :straight t
@@ -229,24 +225,6 @@ Project %(projectile-project-root)"
   :straight t
   :config (global-set-key (kbd "C-M-w") 'er/expand-region))
 
-
-;;(use-package org-roam
-;;      :after org
-;;      :hook
-;;      ((org-mode . org-roam-mode)
-;;       (after-init . org-roam--build-cache-async) ;; optional!
-;;       )
-;;      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
-;;      :custom
-;;  (org-roam-directory "~/Dropbox/org/roam/")
-;;  (org-roam-graph-viewer "/usr/bin/open")
-;;      :bind
-;;      ("C-c n l" . org-roam)
-;;      ("C-c n t" . org-roam-today)
-;;      ("C-c n f" . org-roam-find-file)
-;;      ("C-c n i" . org-roam-insert)
-;;      ("C-c n g" . org-roam-show-graph))
-
 ;;(use-package markdown-mode
 ;;  :straight t)
 ;;
@@ -254,6 +232,9 @@ Project %(projectile-project-root)"
 ;;  :straight t)
 
 (use-package haml-mode
+  :straight t)
+
+(use-package yaml-mode
   :straight t)
 
 (use-package multiple-cursors
@@ -302,12 +283,6 @@ Project %(projectile-project-root)"
             (global-set-key (kbd "C-c f") 'yafolding-hydra/body)))
 
 
-;;(use-package emmet-mode
-;;  :straight t
-;;  :config
-;;  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-;;  (add-hook 'css-mode-hook 'emmet-mode))
-
 (use-package org-pomodoro
   :straight t)
 
@@ -324,14 +299,9 @@ Project %(projectile-project-root)"
 (use-package groovy-mode
   :straight t
   :config (add-to-list 'auto-mode-alist '("\.gradle$" . groovy-mode)))
-;;(use-package lua-mode
-;;  :straight t)
 
-  ;;(use-package json-mode
+;;(use-package json-mode
 ;;:straight t)
-
-;;(use-package highlight-symbol
-;;  :straight t)
 
 (use-package diff-hl
   :straight t
@@ -342,10 +312,6 @@ Project %(projectile-project-root)"
 
 (use-package ecukes
   :straight t)
-
-;;(use-package aggressive-indent
-;;  :straight t
-;;  :config (global-aggressive-indent-mode 1))
 
 (use-package autorevert
   :straight t
@@ -360,13 +326,6 @@ Project %(projectile-project-root)"
   :config (move-text-default-bindings))
 
 (use-package goto-chg
-  :straight t)
-
-;;(use-package workgroups2
-;;  :straight t
-;;  :config (workgroups-mode 1))
-
-(use-package buffer-move
   :straight t)
 
 (use-package which-key
@@ -388,24 +347,15 @@ Project %(projectile-project-root)"
 (use-package counsel
   :straight t)
 
-(use-package dired+
-  :straight t)
-
-;; uses magit-popup
-;;(use-package swiper-helm
-  ;; :straight t)
-
 (use-package command-log-mode
   :straight t)
 
-(use-package dts-mode
+(use-package dts-mode ; device tree mode
   :straight t)
 
 (use-package ggtags
   :straight t)
 
-(use-package fzf
-  :straight t)
 (require 'hideshow)
 (require 'sgml-mode)
 (require 'nxml-mode)
@@ -537,17 +487,11 @@ point reaches the beginning or end of the buffer, stop there."
   (interactive)
   (message "setting up d-mode indents")
   (c-set-style "my-d-mode")
-  (setq show-trailing-whitespace t)
   )
-
-;;(use-package mini-modeline
-;;  :straight t
-;;  :config (setq mini-modeline-mode t))
-
 
 (use-package d-mode
   :straight t
-  :config (add-hook 'd-mode-hook 'my-d-mode-setup))
+  :hook (d-mode . my-d-mode-setup))
 
 (use-package helm-dash
   :straight t)
@@ -567,42 +511,14 @@ point reaches the beginning or end of the buffer, stop there."
       '((d-mode) "/Users/christian.koestlin/bin/serve-d" "--logLevel=all"))
     (add-to-list 'eglot-server-programs
       '((rust-mode) . ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))
-    (require 'eglot-x)
-    (eglot-x-setup)
+    ;;(require 'eglot-x)
+    ;;(eglot-x-setup)
     ))
 
-;;(use-package evil
+;;(use-package lib-requires
 ;;  :straight t)
-;;(use-package general
-;;  :straight t)
-;;
-;;  :config
-;;    (progn
-;;      (general-define-key
-;;        :states '(normal visual insert emacs)
-;;        :prefix "SPC"
-;;        :non-normal-prefix "M-SPC"
-;;        "'" '(iterm-focus :which-key "iterm")
-;;        "?" '(iterm-goto-filedir-or-home :which-key "iterm - goto dir")
-;;        "/" '(counsel-ag :wich-key "ag")
-;;        "TAB" '(ivy-switch-buffer :which-key "prev buffer")
-;;        "." '(avy-goto-word-or-subword-1  :which-key "go to word")
-;;        "SPC" '(counsel-M-x :which-key "M-x")
-;;        "a" '(hydra-launcher/body :which-key "Applications")
-;;        "b" '(hydra-buffer/body t :which-key "Buffer")
-;;        "c" '(:ignore t :which-key "Comment")
-;;        "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
-;;        "w" '(hydra-window/body :which-key "Window")
-;;        "f" '(:ignore t :which-key "Files")
-;;        "fd" '(counsel-git :which-key "find in git dir")
-;;        ;; ...
-;;        )
-;;      )
-;;  )
-(use-package lib-requires
-  :straight t)
-(libreq-requires-tree 'project)
-(libreq-requires-tree 'cl-generic)
+;;(libreq-requires-tree 'project)
+;;(libreq-requires-tree 'cl-generic)
 
 (use-package jinx
   :straight t
@@ -610,10 +526,6 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages)))
 
-;;(use-package codium
-;;  :straight (codeium :type git :host github :repo "Exafunction/codeium.el"))
-
-;;
 ;;(defun my-before-switch-project-hook ()
 ;;  "Perform some action after switching Projectile projects."
 ;;  (message "Before switching project...")
@@ -680,7 +592,7 @@ point reaches the beginning or end of the buffer, stop there."
   :straight t)
 
 (use-package eat
-  :straight (eat :type git :host codeberg :repo "akib/emacs-eat"))
+  :straight (eat :type git :host nil :repo "https://codeberg.org/akib/emacs-eat"))
 
 ;;(defun jump-to-org-agenda ()
 ;;  "Open my org agenda."
@@ -743,7 +655,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 (run-at-time t (* 5 60) 'recentf-save-list)
 (toggle-frame-maximized)
-
 
 (defun dlang--find-root ()
   "Find dlang-build root directory."
