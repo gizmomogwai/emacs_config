@@ -161,14 +161,9 @@
  '(org-confirm-babel-evaluate nil)
  '(org-export-timestamp-file nil)
  '(org-file-apps
-   '(
-     (auto-mode . emacs)
-     ("\\.mm\\'" . default)
-     ("\\.x?html?\\'" . default)
-     ("\\.pdf\\'" . default)
-     ("\\.md" . emacs)
-     (directory . emacs)
-     ))
+    '((auto-mode . emacs) ("\\.mm\\'" . default)
+       ("\\.x?html?\\'" . default) ("\\.pdf\\'" . default)
+       ("\\.md" . emacs) (directory . emacs)))
  '(org-log-done 'note)
  '(org-plantuml-jar-path "~/bin/plantuml.jar")
  '(org-pomodoro-length 20)
@@ -240,7 +235,9 @@
  '(warning-suppress-log-types '((use-package)))
  '(whitespace-style '(trailing tabs spaces indentation::space tab-mark))
  '(x-stretch-cursor t)
- '(yas-snippet-dirs '("~/Sync/configs/emacs/.emacs.d/snippets/.")))
+ '(yas-snippet-dirs
+    '("~/.emacs.d/private/snippets"
+       "~/.emacs.d/straight/repos/yasnippet-snippets/snippets")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

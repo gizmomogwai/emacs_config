@@ -244,17 +244,16 @@ Project %(projectile-project-root)"
   (global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
   (global-set-key (kbd "M-a") 'mc/mark-all-like-this))
 
+(use-package yasnippet-snippets
+  :straight t)
+
 (use-package yasnippet
   :straight t
   :config
       (yas-global-mode 1)
   )
 
-(use-package yasnippet-snippets
-  :straight t)
 
-;;(use-package yasnippet-snippets
-;;  :straight t)
 (defun company-mode/backend-with-yas (backend)
   "Add yas as backend to the given BACKEND."
   (if (or
